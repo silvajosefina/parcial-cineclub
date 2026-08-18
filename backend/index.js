@@ -78,6 +78,19 @@ app.post('/api/movies/:tmdbId/reviews', (req, res) => {
     return res.status(201).json(review)
 })
 
+app.delete('/api/reviews/:reviewId', (req, res) => {
+    const reviewId = Number(req.params.reviewId)
+    const reviewIndex = reviews.findIndex(review => review.id === reviewId)
+
+    if (reviewIndex === -1) {
+        return res.status(404).json({ error: 'Reseña no encontrada' })
+    }
+
+    reviews.splice(reviewIndex, 1)
+
+    return res.status(204).send()
+})
+
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`)
-})
+}) 
