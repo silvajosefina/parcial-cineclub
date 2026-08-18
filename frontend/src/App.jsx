@@ -32,13 +32,17 @@ function App() {
     setError('')
 
     try {
-      const url = `${API_URL}/api/movies/search?q=${encodeURIComponent(trimmedQuery)}`
+      const url =
+        `${API_URL}/api/movies/search?q=${encodeURIComponent(trimmedQuery)}`
 
       const response = await fetch(url)
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al buscar películas')
+        throw new Error(
+          data.error ||
+          'Error al buscar películas'
+        )
       }
 
       setMovies(data)
@@ -48,10 +52,13 @@ function App() {
       setLastQuery(trimmedQuery)
 
       if (error.message === 'Failed to fetch') {
-        setError('No se pudo conectar con el servidor')
+        setError(
+          'No se pudo conectar con el servidor'
+        )
       } else {
         setError(
-          error.message || 'No se pudo realizar la búsqueda'
+          error.message ||
+          'No se pudo realizar la búsqueda'
         )
       }
     } finally {
@@ -63,16 +70,35 @@ function App() {
     navigate(`/movie/${movie.id}`)
   }
 
+  const handleMovieUpdated = (updatedMovie) => {
+    setMovies((currentMovies) =>
+      currentMovies.map((movie) =>
+        movie.id === updatedMovie.id
+          ? {
+            ...movie,
+            avgScore: updatedMovie.avgScore
+          }
+          : movie
+      )
+    )
+  }
+
   return (
     <>
       <header className="topbar">
         <div className="topbar-content">
-          <Link to="/" className="brand">
+          <Link
+            to="/"
+            className="brand"
+          >
             CineClub
           </Link>
 
           {isDetail && (
-            <Link to="/" className="topbar-back">
+            <Link
+              to="/"
+              className="topbar-back"
+            >
               Volver a búsqueda
             </Link>
           )}
@@ -86,14 +112,19 @@ function App() {
             element={
               <section className="search-page">
                 <div className="search-intro">
-                  <h1>Encontrá una película</h1>
+                  <h1>
+                    Encontrá una película
+                  </h1>
 
                   <p>
-                    Buscá títulos, consultá sus detalles y compartí tu opinión.
+                    Buscá títulos, consultá sus
+                    detalles y compartí tu opinión.
                   </p>
                 </div>
 
-                <SearchBar onSearch={handleSearch} />
+                <SearchBar
+                  onSearch={handleSearch}
+                />
 
                 {loading && (
                   <p className="message">
@@ -107,15 +138,23 @@ function App() {
                   </p>
                 )}
 
-                {!loading && !error && lastQuery && (
-                  <div className="results-header">
-                    <p>
-                      {movies.length} resultado
-                      {movies.length !== 1 ? 's' : ''} para{' '}
-                      <strong>"{lastQuery}"</strong>
-                    </p>
-                  </div>
-                )}
+                {!loading &&
+                  !error &&
+                  lastQuery && (
+                    <div className="results-header">
+                      <p>
+                        {movies.length}{' '}
+                        resultado
+                        {movies.length !== 1
+                          ? 's'
+                          : ''}{' '}
+                        para{' '}
+                        <strong>
+                          "{lastQuery}"
+                        </strong>
+                      </p>
+                    </div>
+                  )}
 
                 {!loading &&
                   !error &&
@@ -126,19 +165,28 @@ function App() {
                     </div>
                   )}
 
-                {!loading && movies.length > 0 && (
-                  <MovieGrid
-                    movies={movies}
-                    onSelectMovie={handleSelectMovie}
-                  />
-                )}
+                {!loading &&
+                  movies.length > 0 && (
+                    <MovieGrid
+                      movies={movies}
+                      onSelectMovie={
+                        handleSelectMovie
+                      }
+                    />
+                  )}
               </section>
             }
           />
 
           <Route
             path="/movie/:tmdbId"
-            element={<MovieDetail />}
+            element={
+              <MovieDetail
+                onMovieUpdated={
+                  handleMovieUpdated
+                }
+              />
+            }
           />
         </Routes>
       </main>

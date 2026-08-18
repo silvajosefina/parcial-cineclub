@@ -1,7 +1,8 @@
-const scoreFormatter = new Intl.NumberFormat('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1
-})
+const scoreFormatter =
+    new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+    })
 
 const renderStars = (score) => {
     const filledStars = Math.round(score)
@@ -23,7 +24,10 @@ const renderStars = (score) => {
     )
 }
 
-const MovieCard = ({ movie, onSelect }) => {
+const MovieCard = ({
+    movie,
+    onSelect
+}) => {
     const year = movie.release_date
         ? movie.release_date.slice(0, 4)
         : 'Sin fecha'
@@ -47,7 +51,9 @@ const MovieCard = ({ movie, onSelect }) => {
                     {year}
                 </span>
 
-                <h2>{movie.title}</h2>
+                <h2>
+                    {movie.title}
+                </h2>
 
                 {movie.avgScore !== null ? (
                     <div className="movie-card-rating">

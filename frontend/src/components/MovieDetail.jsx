@@ -5,10 +5,11 @@ import ReviewForm from './ReviewForm'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const scoreFormatter = new Intl.NumberFormat('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1
-})
+const scoreFormatter =
+    new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+    })
 
 const renderStars = (score) => {
     const filledStars = Math.round(score)
@@ -30,13 +31,24 @@ const renderStars = (score) => {
     )
 }
 
-const MovieDetail = () => {
+const MovieDetail = ({
+    onMovieUpdated
+}) => {
     const { tmdbId } = useParams()
 
-    const [movie, setMovie] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
-    const [deleteError, setDeleteError] = useState('')
+    const [movie, setMovie] =
+        useState(null)
+
+    const [loading, setLoading] =
+        useState(true)
+
+    const [error, setError] =
+        useState('')
+
+    const [
+        deleteError,
+        setDeleteError
+    ] = useState('')
 
     const loadMovie = async () => {
         setLoading(true)
@@ -46,8 +58,11 @@ const MovieDetail = () => {
             const url =
                 `${API_URL}/api/movies/${tmdbId}`
 
-            const response = await fetch(url)
-            const data = await response.json()
+            const response =
+                await fetch(url)
+
+            const data =
+                await response.json()
 
             if (!response.ok) {
                 throw new Error(
@@ -57,10 +72,17 @@ const MovieDetail = () => {
             }
 
             setMovie(data)
+
+            if (onMovieUpdated) {
+                onMovieUpdated(data)
+            }
         } catch (error) {
             setMovie(null)
 
-            if (error.message === 'Failed to fetch') {
+            if (
+                error.message ===
+                'Failed to fetch'
+            ) {
                 setError(
                     'No se pudo conectar con el servidor'
                 )
@@ -79,70 +101,85 @@ const MovieDetail = () => {
         loadMovie()
     }, [tmdbId])
 
-    const handleAddReview = async (review) => {
-        const url =
-            `${API_URL}/api/movies/${tmdbId}/reviews`
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(review)
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-            throw new Error(
-                data.error ||
-                'No se pudo agregar la reseña'
-            )
-        }
-
-        await loadMovie()
-    }
-
-    const handleDeleteReview = async (reviewId) => {
-        setDeleteError('')
-
-        try {
+    const handleAddReview =
+        async (review) => {
             const url =
-                `${API_URL}/api/reviews/${reviewId}`
+                `${API_URL}/api/movies/${tmdbId}/reviews`
 
-            const response = await fetch(url, {
-                method: 'DELETE'
-            })
+            const response =
+                await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+                    body:
+                        JSON.stringify(review)
+                })
+
+            const data =
+                await response.json()
 
             if (!response.ok) {
-                let message =
-                    'No se pudo eliminar la reseña'
-
-                if (response.status !== 204) {
-                    const data =
-                        await response.json()
-
-                    message =
-                        data.error || message
-                }
-
-                throw new Error(message)
+                throw new Error(
+                    data.error ||
+                    'No se pudo agregar la reseña'
+                )
             }
 
             await loadMovie()
-        } catch (error) {
-            if (error.message === 'Failed to fetch') {
-                setDeleteError(
-                    'No se pudo conectar con el servidor'
-                )
-            } else {
-                setDeleteError(
-                    error.message ||
-                    'No se pudo eliminar la reseña'
-                )
+        }
+
+    const handleDeleteReview =
+        async (reviewId) => {
+            setDeleteError('')
+
+            try {
+                const url =
+                    `${API_URL}/api/reviews/${reviewId}`
+
+                const response =
+                    await fetch(url, {
+                        method: 'DELETE'
+                    })
+
+                if (!response.ok) {
+                    let message =
+                        'No se pudo eliminar la reseña'
+
+                    if (
+                        response.status !== 204
+                    ) {
+                        const data =
+                            await response.json()
+
+                        message =
+                            data.error ||
+                            message
+                    }
+
+                    throw new Error(
+                        message
+                    )
+                }
+
+                await loadMovie()
+            } catch (error) {
+                if (
+                    error.message ===
+                    'Failed to fetch'
+                ) {
+                    setDeleteError(
+                        'No se pudo conectar con el servidor'
+                    )
+                } else {
+                    setDeleteError(
+                        error.message ||
+                        'No se pudo eliminar la reseña'
+                    )
+                }
             }
         }
-    }
 
     if (loading) {
         return (
@@ -164,9 +201,13 @@ const MovieDetail = () => {
         return null
     }
 
-    const year = movie.release_date
-        ? movie.release_date.slice(0, 4)
-        : 'Sin fecha'
+    const year =
+        movie.release_date
+            ? movie.release_date.slice(
+                0,
+                4
+            )
+            : 'Sin fecha'
 
     return (
         <div className="movie-detail">
@@ -209,9 +250,14 @@ const MovieDetail = () => {
 
                                 <span className="review-count">
                                     Promedio de{' '}
-                                    {movie.reviews.length}{' '}
+                                    {
+                                        movie
+                                            .reviews
+                                            .length
+                                    }{' '}
                                     reseña
-                                    {movie.reviews.length !== 1
+                                    {movie.reviews
+                                        .length !== 1
                                         ? 's'
                                         : ''}
                                 </span>
@@ -232,7 +278,9 @@ const MovieDetail = () => {
 
             <ReviewList
                 reviews={movie.reviews}
-                onDeleteReview={handleDeleteReview}
+                onDeleteReview={
+                    handleDeleteReview
+                }
             />
 
             {deleteError && (
@@ -242,7 +290,9 @@ const MovieDetail = () => {
             )}
 
             <ReviewForm
-                onAddReview={handleAddReview}
+                onAddReview={
+                    handleAddReview
+                }
             />
         </div>
     )

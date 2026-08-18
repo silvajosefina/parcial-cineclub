@@ -36,13 +36,19 @@
 .topbar {
   width: 100%;
 
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(255,
+      255,
+      255,
+      0.98);
 
-  border-bottom: 1px solid var(--border);
+  border-bottom:
+    1px solid var(--border);
 }
 
 .topbar-content {
-  width: min(920px, calc(100% - 40px));
+  width:
+    min(920px,
+      calc(100% - 40px));
 
   min-height: 62px;
 
@@ -60,9 +66,11 @@
 .brand {
   color: var(--text-dark);
 
-  font-size: 0.96rem;
+  font-size: 1.2rem;
 
-  font-weight: 600;
+  font-weight: 650;
+
+  letter-spacing: -0.02em;
 
   text-decoration: none;
 }
@@ -85,7 +93,9 @@
 }
 
 .app {
-  width: min(920px, calc(100% - 40px));
+  width:
+    min(920px,
+      calc(100% - 40px));
 
   margin: 0 auto;
 
@@ -139,11 +149,13 @@
 
   padding: 0 14px;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
 
   border-radius: 11px;
 
-  background-color: var(--surface);
+  background-color:
+    var(--surface);
 
   transition:
     border-color 0.2s ease,
@@ -163,7 +175,6 @@
 
 .search-icon {
   width: 18px;
-
   height: 18px;
 
   flex-shrink: 0;
@@ -224,7 +235,8 @@
 }
 
 .search-bar>button:hover {
-  background-color: var(--blue-dark);
+  background-color:
+    var(--blue-dark);
 
   box-shadow:
     0 9px 20px rgba(37, 99, 235, 0.28);
@@ -269,11 +281,13 @@
 
   flex-direction: column;
 
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
 
   border-radius: 12px;
 
-  background-color: var(--surface);
+  background-color:
+    var(--surface);
 
   transition:
     transform 0.2s ease,
@@ -339,7 +353,8 @@
 
   border-radius: 999px;
 
-  background-color: var(--cyan-light);
+  background-color:
+    var(--cyan-light);
 
   color: var(--cyan-text);
 
@@ -361,23 +376,31 @@
 }
 
 .movie-card-rating {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-height: 22px;
+
   margin-bottom: 14px;
 }
 
 .card-score {
-  display: block;
-
-  margin-bottom: 5px;
-
   color: var(--green);
 
   font-size: 1.15rem;
 
   font-weight: 650;
+
+  line-height: 1;
 }
 
 .stars {
   display: flex;
+
+  align-items: center;
 
   gap: 1px;
 }
@@ -386,6 +409,8 @@
   color: #e5e7eb;
 
   font-size: 0.84rem;
+
+  line-height: 1;
 }
 
 .star.filled {
@@ -407,11 +432,13 @@
 
   margin-top: auto;
 
-  border: 1px solid #bfdbfe;
+  border:
+    1px solid #bfdbfe;
 
   border-radius: 8px;
 
-  background-color: var(--blue-light);
+  background-color:
+    var(--blue-light);
 
   color: var(--blue);
 
@@ -428,7 +455,8 @@
 .detail-button:hover {
   border-color: #93c5fd;
 
-  background-color: var(--blue-soft);
+  background-color:
+    var(--blue-soft);
 
   color: var(--blue-dark);
 }
@@ -599,26 +627,28 @@
 }
 
 .review-card:nth-child(3n + 1) .review-avatar {
-  background-color: var(--blue-light);
+  background-color:
+    var(--blue-light);
 
   color: var(--blue);
 }
 
 .review-card:nth-child(3n + 2) .review-avatar {
-  background-color: var(--green-light);
+  background-color:
+    var(--green-light);
 
   color: var(--green);
 }
 
 .review-card:nth-child(3n + 3) .review-avatar {
-  background-color: var(--purple-light);
+  background-color:
+    var(--purple-light);
 
   color: var(--purple-text);
 }
 
 .review-avatar {
   width: 40px;
-
   height: 40px;
 
   display: flex;
@@ -711,11 +741,13 @@
 
   padding: 0 10px;
 
-  border: 1px solid #fecaca;
+  border:
+    1px solid #fecaca;
 
   border-radius: 7px;
 
-  background-color: var(--red-light);
+  background-color:
+    var(--red-light);
 
   color: var(--red);
 
@@ -732,7 +764,8 @@
 .delete-button:hover {
   border-color: #fca5a5;
 
-  background-color: var(--red-soft);
+  background-color:
+    var(--red-soft);
 
   color: var(--red-dark);
 }
@@ -881,7 +914,8 @@
 
   border-radius: 9px;
 
-  background-color: var(--green);
+  background-color:
+    var(--green);
 
   color: #ffffff;
 
@@ -899,7 +933,8 @@
 }
 
 .submit-review-button:hover {
-  background-color: var(--green-dark);
+  background-color:
+    var(--green-dark);
 
   box-shadow:
     0 9px 19px rgba(22, 163, 74, 0.25);
@@ -925,7 +960,8 @@
 
   border-radius: 9px;
 
-  background-color: var(--red-light);
+  background-color:
+    var(--red-light);
 
   color: var(--red-dark);
 }
@@ -935,7 +971,8 @@
   .topbar-content,
   .app {
     width:
-      min(100% - 24px, 920px);
+      min(100% - 24px,
+        920px);
   }
 
   .movie-detail-main {
@@ -967,7 +1004,8 @@
   .review-actions {
     width: 100%;
 
-    justify-content: space-between;
+    justify-content:
+      space-between;
   }
 }
 
