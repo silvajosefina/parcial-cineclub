@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
+import ReviewList from './ReviewList'
+import ReviewForm from './ReviewForm'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -7,18 +9,42 @@ const MovieDetail = () => {
     const { tmdbId } = useParams()
     const [movie, setMovie] = useState(null)
 
+    const loadMovie = async () => {
+        const url = `${API_URL}/api/movies/${tmdbId}`
+
+        const response = await fetch(url)
+        const data = await response.json()
+
+        setMovie(data)
+    }
+
     useEffect(() => {
-        const loadMovie = async () => {
-            const url = `${API_URL}/api/movies/${tmdbId}`
-
-            const response = await fetch(url)
-            const data = await response.json()
-
-            setMovie(data)
-        }
-
         loadMovie()
     }, [tmdbId])
+
+    const handleAddReview = async (review) => {
+        const url = `${API_URL}/api/movies/${tmdbId}/reviews`
+
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(review)
+        })
+
+        await loadMovie()
+    }
+
+    const handleDeleteReview = async (reviewId) => {
+        const url = `${API_URL}/api/reviews/${reviewId}`
+
+        await fetch(url, {
+            method: 'DELETE'
+        })
+
+        await loadMovie()
+    }
 
     if (!movie) {
         return <p>Cargando...</p>
@@ -50,6 +76,13 @@ const MovieDetail = () => {
                     ? movie.avgScore
                     : 'Sin reseñas'}
             </p>
+
+            <ReviewList
+                reviews={movie.reviews}
+                onDeleteReview={handleDeleteReview}
+            />
+
+            <ReviewForm onAddReview={handleAddReview} />
         </div>
     )
 }
