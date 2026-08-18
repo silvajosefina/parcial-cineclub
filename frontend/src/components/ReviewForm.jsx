@@ -2,22 +2,21 @@ import { useState } from 'react'
 
 const ReviewForm = ({ onAddReview }) => {
     const [author, setAuthor] = useState('')
-    const [score, setScore] = useState('')
+    const [score, setScore] = useState(0)
     const [comment, setComment] = useState('')
     const [error, setError] = useState('')
 
     const handleSubmit = async (event) => {
         event.preventDefault()
 
-        if (!author.trim() || !score || !comment.trim()) {
-            setError('Todos los campos son obligatorios')
-            return
-        }
-
-        const numericScore = Number(score)
-
-        if (numericScore < 1 || numericScore > 5) {
-            setError('El puntaje debe estar entre 1 y 5')
+        if (
+            !author.trim() ||
+            !score ||
+            !comment.trim()
+        ) {
+            setError(
+                'Todos los campos son obligatorios'
+            )
             return
         }
 
@@ -26,58 +25,119 @@ const ReviewForm = ({ onAddReview }) => {
         try {
             await onAddReview({
                 author,
-                score: numericScore,
+                score,
                 comment
             })
 
             setAuthor('')
-            setScore('')
+            setScore(0)
             setComment('')
         } catch (error) {
             if (error.message === 'Failed to fetch') {
-                setError('No se pudo conectar con el servidor')
+                setError(
+                    'No se pudo conectar con el servidor'
+                )
             } else {
-                setError(error.message || 'No se pudo agregar la reseña')
+                setError(
+                    error.message ||
+                    'No se pudo agregar la reseña'
+                )
             }
         }
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h3>Agregar reseña</h3>
+        <section className="review-form-section">
+            <h2>
+                Agregar reseña
+            </h2>
 
-            <div>
-                <label>Autor</label>
-                <input
-                    type="text"
-                    value={author}
-                    onChange={(event) => setAuthor(event.target.value)}
-                />
-            </div>
+            <form
+                className="review-form"
+                onSubmit={handleSubmit}
+            >
+                <div className="form-group">
+                    <label htmlFor="author">
+                        Tu nombre
+                    </label>
 
-            <div>
-                <label>Puntaje</label>
-                <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={score}
-                    onChange={(event) => setScore(event.target.value)}
-                />
-            </div>
+                    <input
+                        id="author"
+                        type="text"
+                        placeholder="Ej.: Josefina"
+                        value={author}
+                        onChange={(event) =>
+                            setAuthor(
+                                event.target.value
+                            )
+                        }
+                    />
+                </div>
 
-            <div>
-                <label>Comentario</label>
-                <textarea
-                    value={comment}
-                    onChange={(event) => setComment(event.target.value)}
-                />
-            </div>
+                <div className="form-group">
+                    <label>
+                        Puntaje
+                    </label>
 
-            {error && <p>{error}</p>}
+                    <div className="rating-selector">
+                        {[1, 2, 3, 4, 5].map(
+                            (value) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    className={
+                                        value <= score
+                                            ? 'rating-star active'
+                                            : 'rating-star'
+                                    }
+                                    onClick={() =>
+                                        setScore(value)
+                                    }
+                                >
+                                    ★
+                                </button>
+                            )
+                        )}
+                    </div>
 
-            <button type="submit">Agregar reseña</button>
-        </form>
+                    <span className="rating-helper">
+                        {score
+                            ? `${score} de 5`
+                            : 'Seleccioná un puntaje'}
+                    </span>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="comment">
+                        Comentario
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        placeholder="¿Qué te pareció la película?"
+                        value={comment}
+                        onChange={(event) =>
+                            setComment(
+                                event.target.value
+                            )
+                        }
+                    />
+                </div>
+
+                {error && (
+                    <p className="message error-message">
+                        {error}
+                    </p>
+                )}
+
+                <button
+                    className="submit-review-button"
+                    type="submit"
+                >
+                    Publicar reseña
+                </button>
+            </form>
+        </section>
     )
 }
 

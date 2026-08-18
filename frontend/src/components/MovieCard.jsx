@@ -1,31 +1,84 @@
+const scoreFormatter = new Intl.NumberFormat('es-AR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1
+})
+
+const renderStars = (score) => {
+    const filledStars = Math.round(score)
+
+    return Array.from(
+        { length: 5 },
+        (_, index) => (
+            <span
+                key={index}
+                className={
+                    index < filledStars
+                        ? 'star filled'
+                        : 'star'
+                }
+            >
+                ★
+            </span>
+        )
+    )
+}
+
 const MovieCard = ({ movie, onSelect }) => {
+    const year = movie.release_date
+        ? movie.release_date.slice(0, 4)
+        : 'Sin fecha'
+
     return (
-        <div>
-            {movie.poster_path && (
+        <article className="movie-card">
+            {movie.poster_path ? (
                 <img
+                    className="movie-card-poster"
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                     alt={`Póster de ${movie.title}`}
                 />
+            ) : (
+                <div className="movie-card-poster movie-placeholder">
+                    Sin imagen
+                </div>
             )}
 
-            <h2>{movie.title}</h2>
+            <div className="movie-card-content">
+                <span className="year-pill">
+                    {year}
+                </span>
 
-            <p>
-                {movie.release_date
-                    ? movie.release_date.slice(0, 4)
-                    : 'Sin fecha'}
-            </p>
+                <h2>{movie.title}</h2>
 
-            <p>
-                Puntaje: {movie.avgScore !== null
-                    ? movie.avgScore
-                    : 'Sin reseñas'}
-            </p>
+                {movie.avgScore !== null ? (
+                    <div className="movie-card-rating">
+                        <span className="card-score">
+                            {scoreFormatter.format(
+                                movie.avgScore
+                            )}
+                        </span>
 
-            <button onClick={() => onSelect(movie)}>
-                Ver detalle
-            </button>
-        </div>
+                        <div className="stars">
+                            {renderStars(
+                                movie.avgScore
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <span className="no-rating">
+                        Sin reseñas
+                    </span>
+                )}
+
+                <button
+                    className="detail-button"
+                    onClick={() =>
+                        onSelect(movie)
+                    }
+                >
+                    Ver detalle
+                </button>
+            </div>
+        </article>
     )
 }
 
