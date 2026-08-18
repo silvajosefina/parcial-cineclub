@@ -11,14 +11,36 @@ function App() {
   const navigate = useNavigate()
 
   const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSearch = async (query) => {
-    const url = `${API_URL}/api/movies/search?q=${encodeURIComponent(query)}`
+    if (!query.trim()) {
+      setError('Ingresá una película para buscar')
+      setMovies([])
+      return
+    }
 
-    const response = await fetch(url)
-    const data = await response.json()
+    setLoading(true)
+    setError('')
 
-    setMovies(data)
+    try {
+      const url = `${API_URL}/api/movies/search?q=${encodeURIComponent(query)}`
+
+      const response = await fetch(url)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al buscar películas')
+      }
+
+      setMovies(data)
+    } catch (error) {
+      setMovies([])
+      setError(error.message || 'No se pudo realizar la búsqueda')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSelectMovie = (movie) => {
@@ -36,10 +58,16 @@ function App() {
             <>
               <SearchBar onSearch={handleSearch} />
 
-              <MovieGrid
-                movies={movies}
-                onSelectMovie={handleSelectMovie}
-              />
+              {loading && <p>Cargando...</p>}
+
+              {error && <p>{error}</p>}
+
+              {!loading && (
+                <MovieGrid
+                  movies={movies}
+                  onSelectMovie={handleSelectMovie}
+                />
+              )}
             </>
           }
         />

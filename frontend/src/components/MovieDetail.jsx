@@ -8,14 +8,31 @@ const API_URL = import.meta.env.VITE_API_URL
 const MovieDetail = () => {
     const { tmdbId } = useParams()
     const [movie, setMovie] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
+    const [deleteError, setDeleteError] = useState('')
 
     const loadMovie = async () => {
-        const url = `${API_URL}/api/movies/${tmdbId}`
+        setLoading(true)
+        setError('')
 
-        const response = await fetch(url)
-        const data = await response.json()
+        try {
+            const url = `${API_URL}/api/movies/${tmdbId}`
 
-        setMovie(data)
+            const response = await fetch(url)
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al cargar la película')
+            }
+
+            setMovie(data)
+        } catch (error) {
+            setMovie(null)
+            setError('No se pudo conectar con el servidor')
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -25,7 +42,7 @@ const MovieDetail = () => {
     const handleAddReview = async (review) => {
         const url = `${API_URL}/api/movies/${tmdbId}/reviews`
 
-        await fetch(url, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -33,21 +50,61 @@ const MovieDetail = () => {
             body: JSON.stringify(review)
         })
 
+        const data = await response.json()
+
+        if (!response.ok) {
+            throw new Error(data.error || 'No se pudo agregar la reseña')
+        }
+
         await loadMovie()
     }
 
     const handleDeleteReview = async (reviewId) => {
-        const url = `${API_URL}/api/reviews/${reviewId}`
+        setDeleteError('')
 
-        await fetch(url, {
-            method: 'DELETE'
-        })
+        try {
+            const url = `${API_URL}/api/reviews/${reviewId}`
 
-        await loadMovie()
+            const response = await fetch(url, {
+                method: 'DELETE'
+            })
+
+            if (!response.ok) {
+                let message = 'No se pudo eliminar la reseña'
+
+                if (response.status !== 204) {
+                    const data = await response.json()
+                    message = data.error || message
+                }
+
+                throw new Error(message)
+            }
+
+            await loadMovie()
+        } catch (error) {
+            if (error.message === 'Failed to fetch') {
+                setDeleteError('No se pudo conectar con el servidor')
+            } else {
+                setDeleteError(error.message || 'No se pudo eliminar la reseña')
+            }
+        }
+    }
+
+    if (loading) {
+        return <p>Cargando...</p>
+    }
+
+    if (error) {
+        return (
+            <div>
+                <Link to="/">Volver</Link>
+                <p>{error}</p>
+            </div>
+        )
     }
 
     if (!movie) {
-        return <p>Cargando...</p>
+        return null
     }
 
     return (
@@ -81,6 +138,8 @@ const MovieDetail = () => {
                 reviews={movie.reviews}
                 onDeleteReview={handleDeleteReview}
             />
+
+            {deleteError && <p>{deleteError}</p>}
 
             <ReviewForm onAddReview={handleAddReview} />
         </div>

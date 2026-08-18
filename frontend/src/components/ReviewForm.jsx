@@ -23,15 +23,23 @@ const ReviewForm = ({ onAddReview }) => {
 
         setError('')
 
-        await onAddReview({
-            author,
-            score: numericScore,
-            comment
-        })
+        try {
+            await onAddReview({
+                author,
+                score: numericScore,
+                comment
+            })
 
-        setAuthor('')
-        setScore('')
-        setComment('')
+            setAuthor('')
+            setScore('')
+            setComment('')
+        } catch (error) {
+            if (error.message === 'Failed to fetch') {
+                setError('No se pudo conectar con el servidor')
+            } else {
+                setError(error.message || 'No se pudo agregar la reseña')
+            }
+        }
     }
 
     return (
