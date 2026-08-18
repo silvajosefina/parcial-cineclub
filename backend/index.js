@@ -18,20 +18,38 @@ app.use((req, res, next) => {
 
 app.get('/api/movies/search', async (req, res) => {
     const query = req.query.q
-    if (!query) {
-        return res.status(400).json({ error: 'El parámetro q es obligatorio' })
+
+    if (!query || !query.trim()) {
+        return res.status(400).json({
+            error: 'El parámetro q es obligatorio'
+        })
     }
 
     try {
-        const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(query)}`
+        const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`
+
         const response = await fetch(url)
+
+        if (!response.ok) {
+            return res.status(500).json({
+                error: 'Error al buscar películas'
+            })
+        }
+
         const data = await response.json()
 
         const moviesWithAvgScore = data.results.map(movie => {
-            const movieReviews = reviews.filter(review => review.tmdbId === String(movie.id))
+            const movieReviews = reviews.filter(
+                review => review.tmdbId === String(movie.id)
+            )
+
             const avgScore = movieReviews.length > 0
-                ? movieReviews.reduce((sum, review) => sum + review.score, 0) / movieReviews.length
+                ? movieReviews.reduce(
+                    (sum, review) => sum + review.score,
+                    0
+                ) / movieReviews.length
                 : null
+
             return {
                 ...movie,
                 avgScore
@@ -40,51 +58,90 @@ app.get('/api/movies/search', async (req, res) => {
 
         return res.json(moviesWithAvgScore)
     } catch (error) {
-        return res.status(500).json({ error: 'Error al buscar películas' })
+        return res.status(500).json({
+            error: 'Error al buscar películas'
+        })
     }
 })
 
 app.get('/api/movies/:tmdbId', async (req, res) => {
     const tmdbId = req.params.tmdbId
-    const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}`
-    const response = await fetch(url)
 
-    if (!response.ok) {
-        return res.status(404).json({ error: 'Película no encontrada' })
+    try {
+        const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=es-ES`
+
+        const response = await fetch(url)
+
+        if (response.status === 404) {
+            return res.status(404).json({
+                error: 'Película no encontrada'
+            })
+        }
+
+        if (!response.ok) {
+            return res.status(500).json({
+                error: 'Error al obtener la película'
+            })
+        }
+
+        const movie = await response.json()
+
+        const movieReviews = reviews.filter(
+            review => review.tmdbId === tmdbId
+        )
+
+        const avgScore = movieReviews.length > 0
+            ? movieReviews.reduce(
+                (sum, review) => sum + review.score,
+                0
+            ) / movieReviews.length
+            : null
+
+        return res.json({
+            ...movie,
+            reviews: movieReviews,
+            avgScore
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error: 'Error al obtener la película'
+        })
     }
-
-    const movie = await response.json()
-    const movieReviews = reviews.filter(review => review.tmdbId === tmdbId)
-
-    const avgScore = movieReviews.length > 0
-        ? movieReviews.reduce((sum, review) => sum + review.score, 0) / movieReviews.length
-        : null
-
-    return res.json({
-        ...movie,
-        reviews: movieReviews,
-        avgScore
-    })
 })
 
 app.post('/api/movies/:tmdbId/reviews', (req, res) => {
     const tmdbId = req.params.tmdbId
     const { author, score, comment } = req.body
 
-    if (!author || !score || !comment) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' })
+    if (
+        typeof author !== 'string' ||
+        !author.trim() ||
+        typeof comment !== 'string' ||
+        !comment.trim() ||
+        score === undefined ||
+        score === null
+    ) {
+        return res.status(400).json({
+            error: 'Todos los campos son obligatorios'
+        })
     }
 
-    if (typeof score !== 'number' || score < 1 || score > 5) {
-        return res.status(400).json({ error: 'El puntaje debe ser un número entre 1 y 5' })
+    if (
+        typeof score !== 'number' ||
+        score < 1 ||
+        score > 5
+    ) {
+        return res.status(400).json({
+            error: 'El puntaje debe ser un número entre 1 y 5'
+        })
     }
 
     const review = {
         id: Date.now(),
         tmdbId,
-        author,
+        author: author.trim(),
         score,
-        comment
+        comment: comment.trim()
     }
 
     reviews.push(review)
@@ -94,10 +151,15 @@ app.post('/api/movies/:tmdbId/reviews', (req, res) => {
 
 app.delete('/api/reviews/:reviewId', (req, res) => {
     const reviewId = Number(req.params.reviewId)
-    const reviewIndex = reviews.findIndex(review => review.id === reviewId)
+
+    const reviewIndex = reviews.findIndex(
+        review => review.id === reviewId
+    )
 
     if (reviewIndex === -1) {
-        return res.status(404).json({ error: 'Reseña no encontrada' })
+        return res.status(404).json({
+            error: 'Reseña no encontrada'
+        })
     }
 
     reviews.splice(reviewIndex, 1)
