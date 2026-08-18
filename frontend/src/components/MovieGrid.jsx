@@ -1,9 +1,14 @@
+import MovieCard from './MovieCard'
+
 const MovieGrid = ({ movies }) => {
     return (
         <div>
-            <p>Cantidad de películas: {movies.length}</p>
+            {movies.map(movie => (
+                <MovieCard key={movie.id} movie={movie} />
+            ))}
         </div>
     )
 }
 
 export default MovieGrid
+
