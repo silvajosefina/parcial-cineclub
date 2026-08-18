@@ -1,4 +1,4 @@
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, onSelect }) => {
     return (
         <div>
             {movie.poster_path && (
@@ -21,6 +21,10 @@ const MovieCard = ({ movie }) => {
                     ? movie.avgScore
                     : 'Sin reseñas'}
             </p>
+
+            <button onClick={() => onSelect(movie)}>
+                Ver detalle
+            </button>
         </div>
     )
 }
